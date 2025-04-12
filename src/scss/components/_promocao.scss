@@ -1,0 +1,20 @@
+.black-friday-button {
+  background-color: rgb(255, 187, 0);
+  color: white;
+  border: none;
+  padding: 15px 15px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 18px;
+  text-transform: uppercase;
+  font-weight: bold;
+  box-shadow: 0 0 5px #fbf20f, 0 0 10px #fbf20f, 0 0 15px #fbf20f, 0 0 10px #fbf20f;
+  transition: all 0.3s ease-in-out;
+  margin-bottom: 5px;
+  margin-top: 5px;
+  
+  &:hover {
+    box-shadow: 0 0 10px #fbf20f, 0 0 15px #fbf20f, 0 0 20px #fbf20f, 0 0 15px #fbf20f;
+    transform: scale(1.1);
+  }
+}
