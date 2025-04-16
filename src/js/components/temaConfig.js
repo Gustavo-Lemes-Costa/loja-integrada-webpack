@@ -173,6 +173,120 @@ window.fullBannerMobile = [
   }
 ];
 
+// Configuração do reposicionamento do SmartHint
+$(document).ready(function() {
+    var interval = setInterval(function() {
+        var smart = $('#smarthint-position-1');
+        var carrinho = $('form[action="https://www.mercosulvendas.com.br/checkout/redirect/"]');
+
+        if (smart.length && carrinho.length) {
+            smart.insertAfter(carrinho);
+            clearInterval(interval);
+        }
+    }, 300);
+});
+
+// Configuração da seção de imagens responsivas
+$(document).ready(function() {
+    // Função para criar a nova seção com imagens
+    function createNewSection2() {
+        // Cria a nova seção
+        const newSection = document.createElement('div');
+        newSection.classList.add('new-section');
+
+        // URLs das imagens para mobile
+        const mobileImages = [
+            'https://cdn.awsli.com.br/100/100974/arquivos/mobile-1.png',
+            'https://cdn.awsli.com.br/100/100974/arquivos/mobile-2.png',
+            'https://cdn.awsli.com.br/100/100974/arquivos/mobile-4.png',
+            'https://cdn.awsli.com.br/100/100974/arquivos/mobile-5.png'
+        ];
+
+        // URLs das imagens para desktop
+        const desktopImages = [
+            'https://cdn.awsli.com.br/100/100974/arquivos/desktop-1.png',
+            'https://cdn.awsli.com.br/100/100974/arquivos/desktop-2.png',
+            'https://cdn.awsli.com.br/100/100974/arquivos/desktop-4.png',
+            'https://cdn.awsli.com.br/100/100974/arquivos/desktop-5.png'
+        ];
+
+        // URLs de redirecionamento
+        const links = [
+            'https://www.mercosulvendas.com.br/#&search-term=Linha%20Fit%2014',
+            'https://www.mercosulvendas.com.br/#&search-term=Linha%20Classic%2016',
+            'https://www.mercosulvendas.com.br/#&search-term=Linha%20Master%2020',
+            'https://www.mercosulvendas.com.br/#&search-term=Linha%20Maxx%2025'
+        ];
+
+        // Adiciona 4 imagens à nova seção
+        for (let i = 0; i < 4; i++) {
+            const link = document.createElement('a');
+            link.href = links[i];
+            link.target = '_blank'; // Abre o link em uma nova aba
+
+            const picture = document.createElement('picture');
+
+            const sourceMobile = document.createElement('source');
+            sourceMobile.media = "(max-width: 768px)";
+            sourceMobile.srcset = mobileImages[i]; // Imagens mobile
+
+            const img = document.createElement('img');
+            img.src = desktopImages[i]; // Imagens desktop
+            img.alt = `Image ${i + 1}`;
+
+            picture.appendChild(sourceMobile);
+            picture.appendChild(img);
+            link.appendChild(picture);
+            newSection.appendChild(link);
+        }
+
+        // Insere a nova seção abaixo da seção existente
+        const existingSection = document.querySelector('.secao-principal.row-fluid.sem-coluna');
+        if (existingSection) {
+            existingSection.insertAdjacentElement('afterend', newSection);
+            
+            // Cria os estilos via DOM
+            const style = document.createElement('style');
+            style.textContent = `
+                .new-section {
+                    display: flex;
+                    gap: 4px;
+                }
+
+                .new-section img {
+                    width: 100%;
+                    height: auto;
+                    object-fit: contain;
+                    border-radius: 20px;
+                }
+
+                @media (max-width: 768px) {
+                    .new-section {
+                        flex-direction: column;
+                    }
+
+                    .new-section img {
+                        width: 100%;
+                        height: auto;
+                        object-fit: contain;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            console.log('Seção de imagens responsivas criada com sucesso');
+        } else {
+            console.warn('Elemento .secao-principal.row-fluid.sem-coluna não encontrado');
+        }
+    }
+
+    // Tenta criar a seção, mas apenas se estiver na página inicial
+    if (window.location.pathname === '/' || window.location.pathname === '/index') {
+        // Atrasa ligeiramente para garantir que todos os elementos da página estejam carregados
+        setTimeout(createNewSection2, 1000);
+    }
+});
+
 console.log('Configurações do tema carregadas');
 
 // Exportamos uma função para inicializar as variáveis, embora elas já estejam definidas
