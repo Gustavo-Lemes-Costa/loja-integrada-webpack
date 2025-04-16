@@ -157,6 +157,22 @@ window.slideCategorias = [
   }
 ];
 
+// Configuração do banner mobile
+window.fullBannerMobile = [
+  {
+    "imagem": "https://cdn.awsli.com.br/100/100974/arquivos/banner-mes-do-consumidor---mobile.png",
+    "link": "https://www.mercosulvendas.com.br/super-ofertas-do-mes"
+  },  
+  {
+    "imagem": "https://cdn.awsli.com.br/100/100974/arquivos/banner-renove-sua-casa---mobile.png",
+    "link": "https://www.mercosulvendas.com.br/super-ofertas-do-mes"
+  },    
+  {
+    "imagem": "https://cdn.awsli.com.br/100/100974/arquivos/portas-e-janelas-personalizadas---mobile.png",
+    "link": "https://linktr.ee/mercosulatendimento"
+  }
+];
+
 console.log('Configurações do tema carregadas');
 
 // Exportamos uma função para inicializar as variáveis, embora elas já estejam definidas
