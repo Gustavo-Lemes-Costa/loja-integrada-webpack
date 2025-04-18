@@ -3,6 +3,8 @@
  * Versão simplificada que trabalha com as variáveis globais já definidas em temaConfig.js
  */
 
+import { inicializarFormataPrecos } from './tema/formataPrecos.js';
+
 /**
  * Função principal que aplica personalizações adicionais ao tema
  * Foca em inicializações que vão além das simples configurações de variáveis
@@ -36,6 +38,8 @@ export function inicializarTema() {
   if (window.ofertaRegressiva && window.ofertaRegressiva.menu) {
     configurarMenuOfertasRegressivas();
   }
+  
+  inicializarFormataPrecos();
   
   console.log('Personalizações dinâmicas do tema concluídas');
 }
