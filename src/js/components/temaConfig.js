@@ -160,15 +160,15 @@ window.slideCategorias = [
 // Configuração do banner mobile
 window.fullBannerMobile = [
   {
-    "imagem": "https://cdn.awsli.com.br/100/100974/arquivos/banner-mes-do-consumidor---mobile.png",
+    "imagem": "https://cdn.awsli.com.br/100/100974/arquivos/anivers-rio-mercosul---mobile-1.png",
     "link": "https://www.mercosulvendas.com.br/super-ofertas-do-mes"
   },  
   {
-    "imagem": "https://cdn.awsli.com.br/100/100974/arquivos/banner-renove-sua-casa---mobile.png",
+    "imagem": "https://cdn.awsli.com.br/100/100974/arquivos/anivers-rio-mercosul---mobile-2.png",
     "link": "https://www.mercosulvendas.com.br/super-ofertas-do-mes"
   },    
   {
-    "imagem": "https://cdn.awsli.com.br/100/100974/arquivos/portas-e-janelas-personalizadas---mobile.png",
+    "imagem": "https://cdn.awsli.com.br/100/100974/arquivos/anivers-rio-mercosul---mobile-3.png",
     "link": "https://linktr.ee/mercosulatendimento"
   }
 ];
@@ -688,6 +688,45 @@ $(document).ready(function() {
         }, 30000);
         
         console.log('Formatador de preços do carrinho inicializado');
+    }
+});
+
+// Adicione antes do console.log('Configurações do tema carregadas');
+
+// Desativar popup do carrinho na versão desktop
+$(document).ready(function() {
+    // Método 1: Remover completamente o popup usando CSS
+    const style = document.createElement('style');
+    style.textContent = `
+        .carrinho-interno {
+            display: none !important;
+            pointer-events: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+        }
+        
+        /* Garantir que o carrinho não mude de aparência no hover */
+        .carrinho > a:hover {
+            background-color: inherit !important;
+            color: inherit !important;
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Método 2: Remover os listeners de eventos que mostram o popup
+    const carrinhoElement = document.querySelector('.carrinho');
+    if (carrinhoElement) {
+        // Remover os listeners que podem existir
+        const carrinhoLink = carrinhoElement.querySelector('a');
+        if (carrinhoLink) {
+            const clone = carrinhoLink.cloneNode(true);
+            carrinhoLink.parentNode.replaceChild(clone, carrinhoLink);
+        }
+        
+        // Remover quaisquer listeners jQuery
+        $('.carrinho').off('mouseenter mouseleave');
+        
+        console.log('Popup do carrinho desativado com sucesso');
     }
 });
 
