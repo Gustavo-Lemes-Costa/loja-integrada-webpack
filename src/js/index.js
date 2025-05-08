@@ -5,7 +5,6 @@ console.warn(test);
 import { initWhatsAppButton } from './components/whatsapp';
 import { initPromocaoButton } from './components/promocao.js';
 import { removeInfoEstoque } from './components/estoque';
-import { modificarPaginaCarrinho } from './components/carrinho.js';
 import { inicializarTema } from './components/tema.js';
 import { inicializarConfigTema } from './components/temaConfig.js';
 

@@ -1,6 +1,8 @@
 /**
- * Componente para formatar preços com desconto de PIX
- * Implementa novo layout para exibição de preços em toda a loja
+ * Formatador de Preços Unificado
+ * Combina todas as funcionalidades de formatação de preços em um único componente
+ * Implementa desconto de 10% para PIX e parcelamento em 8x
+ * Evita execução na página do carrinho
  */
 
 // Variáveis de controle global para o módulo
@@ -12,8 +14,18 @@ let verificacoesSemNovos = 0;
 
 /**
  * Inicializa o componente de formatação de preços
+ * @returns {boolean} - Se a inicialização foi bem-sucedida
  */
 export function inicializarFormataPrecos() {
+    // Verificação robusta da página do carrinho
+    if (window.location.pathname.includes('/carrinho') || 
+        window.location.pathname.includes('/carrinho/index') ||
+        window.location.href.includes('/carrinho')) {
+        console.log('Página de carrinho detectada - formatador de preços não será executado');
+        return false;
+    }
+    
+    // Para compatibilidade com código existente
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', iniciarFormatadorOtimizado);
     } else {
@@ -23,11 +35,21 @@ export function inicializarFormataPrecos() {
     return true;
 }
 
+// Aliases para compatibilidade com código existente
+export const inicializarFormatadorPrecos = inicializarFormataPrecos;
+
 /**
  * Inicia o formatador de preços com otimizações
  */
 function iniciarFormatadorOtimizado() {
-    console.log('Inicializando formatador de preços PIX - versão otimizada');
+    // Segunda verificação para garantir que não estamos na página do carrinho
+    if (window.location.pathname.includes('/carrinho') || 
+        window.location.pathname.includes('/carrinho/index') ||
+        window.location.href.includes('/carrinho')) {
+        return;
+    }
+    
+    console.log('Inicializando formatador de preços unificado');
     
     injetarEstilos();
     const formatadosInicial = processarElementos();
@@ -65,6 +87,13 @@ function formatarValor(valor) {
  * @returns {boolean} - Se o elemento foi formatado com sucesso
  */
 function formatarPrecos(el) {
+    // Proteção contra carrinho - verificação tripla
+    if (window.location.pathname.includes('/carrinho') || 
+        window.location.pathname.includes('/carrinho/index') ||
+        window.location.href.includes('/carrinho')) {
+        return false;
+    }
+    
     // Skip se já formatado
     if (elementosProcessados.has(el) || el.querySelector('.novo-layout')) {
         return false;
@@ -73,44 +102,34 @@ function formatarPrecos(el) {
     // Registrar este elemento como processado
     elementosProcessados.add(el);
     
-    // Check context
-    const isCartPage = window.location.pathname.includes('/carrinho');
-    const isCartItem = el.closest('.col-item-unit-price');
-    
     let valorBase, valorOriginal;
 
     try {
-        // Cart page pricing
-        if (isCartPage && isCartItem) {
-            valorBase = parseFloat(isCartItem.getAttribute('data-item-unit-valor'));
-            valorOriginal = el.querySelector('.preco-venda') ? 
-                parseFloat(el.querySelector('.preco-venda').innerText.replace(/[^\d,]/g, "").replace(",", ".").trim()) : 
-                null;
-        } 
-        // Main page and destaque-avista pricing
-        else {
-            const precoOriginal = el.querySelector('.preco-venda');
-            const precoParcelado = el.querySelector('.preco-promocional.cor-principal, .preco-venda.cor-principal');
+        // Obter preços do elemento
+        const precoOriginal = el.querySelector('.preco-venda');
+        const precoParcelado = el.querySelector('.preco-promocional.cor-principal, .preco-venda.cor-principal');
+        
+        valorOriginal = precoOriginal ? 
+            parseFloat(precoOriginal.innerText.replace(/[^\d,]/g, "").replace(",", ".").trim()) : 
+            null;
             
-            valorOriginal = precoOriginal ? 
-                parseFloat(precoOriginal.innerText.replace(/[^\d,]/g, "").replace(",", ".").trim()) : 
-                null;
-                
-            valorBase = precoParcelado ? 
-                parseFloat(precoParcelado.innerText.replace(/[^\d,]/g, "").replace(",", ".").trim()) : 
-                valorOriginal;
-        }
+        valorBase = precoParcelado ? 
+            parseFloat(precoParcelado.innerText.replace(/[^\d,]/g, "").replace(",", ".").trim()) : 
+            valorOriginal;
 
         // Se não conseguiu extrair um valor válido, não seguir
         if (!valorBase || isNaN(valorBase)) {
             return false;
         }
 
+        // Calcular desconto de 10% para PIX
         const valorPix = valorBase - (valorBase * 0.10);
 
+        // Criar o novo layout de preços
         let novoLayout = document.createElement("div");
         novoLayout.classList.add("novo-layout");
 
+        // Mostrar preço original se for diferente do preço base
         if (valorOriginal && valorOriginal !== valorBase) {
             let precoDe = document.createElement("div");
             precoDe.classList.add("preco-de");
@@ -118,17 +137,19 @@ function formatarPrecos(el) {
             novoLayout.appendChild(precoDe);
         }
 
+        // Adicionar preço com desconto PIX
         let precoPixContainer = document.createElement("div");
         precoPixContainer.classList.add("preco-principal");
         precoPixContainer.innerHTML = `<strong>${formatarValor(valorPix)} no Pix</strong>`;
         novoLayout.appendChild(precoPixContainer);
 
+        // Adicionar informação de parcelamento em 8x
         let precoParceladoContainer = document.createElement("div");
         precoParceladoContainer.classList.add("preco-parcelado");
-        precoParceladoContainer.innerHTML = `ou <strong>${formatarValor(valorBase)}</strong> em <strong>12x</strong> de <strong>${formatarValor(valorBase / 12)}</strong>`;
-
+        precoParceladoContainer.innerHTML = `ou <strong>${formatarValor(valorBase)}</strong> em <strong>8x</strong> de <strong>${formatarValor(valorBase / 8)}</strong>`;
         novoLayout.appendChild(precoParceladoContainer);
 
+        // Substituir o conteúdo original
         el.innerHTML = "";
         el.appendChild(novoLayout);
         
@@ -169,7 +190,7 @@ function injetarEstilos() {
         }
 
         .preco-principal strong {
-            color: #00a650 !important; /* Green for PIX price */
+            color: #00a650 !important; /* Verde para preço PIX */
         }
 
         .preco-parcelado {
@@ -180,11 +201,11 @@ function injetarEstilos() {
         }
 
         .preco-parcelado strong {
-            color: #3483fa !important; /* Blue for price values */
+            color: #3483fa !important; /* Azul para valores parcelados */
             font-weight: 700 !important;
         }
 
-        /* Mobile styles */
+        /* Estilos para mobile */
         @media (max-width: 600px) {
             .preco-principal {
                 font-size: 24px !important;
@@ -204,7 +225,18 @@ function injetarEstilos() {
  * Configura o observador para monitorar mudanças no DOM de forma otimizada
  */
 function configurarObservadorOtimizado() {
+    // Não configurar o observador na página do carrinho
+    if (window.location.pathname.includes('/carrinho') || 
+        window.location.pathname.includes('/carrinho/index')) {
+        return;
+    }
+    
     observer = new MutationObserver((mutations) => {
+        // Verificação no callback do observer
+        if (window.location.pathname.includes('/carrinho')) {
+            return;
+        }
+        
         let novosPrecosDetectados = false;
         
         mutations.forEach(mutation => {
@@ -247,6 +279,12 @@ function configurarObservadorOtimizado() {
  * @returns {number} - Número de elementos formatados nesta chamada
  */
 function processarElementos() {
+    // Verificação para garantir que não estamos na página do carrinho
+    if (window.location.pathname.includes('/carrinho') || 
+        window.location.pathname.includes('/carrinho/index')) {
+        return 0;
+    }
+    
     const elementos = document.querySelectorAll('.preco-produto:not(.processado), .destaque-avista:not(.processado)');
     
     if (elementos.length > 0) {
@@ -315,4 +353,30 @@ function iniciarVerificacaoPeriodica() {
             verificacoesSemNovos = 0;
         }
     }, 1000);
+}
+
+/**
+ * Formata um preço individual (para uso externo)
+ * @param {HTMLElement} elemento - O elemento de preço para formatar 
+ * @returns {boolean} - Se a formatação foi bem-sucedida
+ */
+export function formatarPrecoIndividual(elemento) {
+    // Verificação robusta da página do carrinho
+    if (window.location.pathname.includes('/carrinho') || 
+        window.location.pathname.includes('/carrinho/index')) {
+        return false;
+    }
+    
+    return formatarPrecos(elemento);
+}
+
+// Inicialização automática se o script for carregado diretamente
+if (typeof window !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', () => {
+        // Verificação adicional para garantir funcionamento adequado
+        if (!window.location.pathname.includes('/carrinho') && 
+            !window.location.pathname.includes('/carrinho/index')) {
+            inicializarFormataPrecos();
+        }
+    });
 }

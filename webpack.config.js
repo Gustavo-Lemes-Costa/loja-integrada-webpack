@@ -6,6 +6,7 @@ const pkg = require('./package')
 const accountName = require('./package.json').accountName;
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const history = require('connect-history-api-fallback');
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   mode: 'development',
@@ -74,6 +75,11 @@ module.exports = {
     new webpack.HotModuleReplacementPlugin(),
     new MiniCssExtractPlugin({
         filename: `${accountName}-min.css`, // Use accountName em vez de name
+    }),
+    new CopyPlugin({
+      patterns: [
+        { from: './src/js/components/carrinhoRedesign.js', to: 'js/components/' },
+      ],
     }),
   ],
   output: {

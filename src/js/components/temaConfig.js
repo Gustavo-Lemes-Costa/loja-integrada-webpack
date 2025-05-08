@@ -160,15 +160,7 @@ window.slideCategorias = [
 // Configuração do banner mobile
 window.fullBannerMobile = [
   {
-    "imagem": "https://cdn.awsli.com.br/100/100974/arquivos/anivers-rio-mercosul---mobile-1.png",
-    "link": "https://www.mercosulvendas.com.br/super-ofertas-do-mes"
-  },  
-  {
-    "imagem": "https://cdn.awsli.com.br/100/100974/arquivos/anivers-rio-mercosul---mobile-2.png",
-    "link": "https://www.mercosulvendas.com.br/super-ofertas-do-mes"
-  },    
-  {
-    "imagem": "https://cdn.awsli.com.br/100/100974/arquivos/anivers-rio-mercosul---mobile-3.png",
+    "imagem": "https://cdn.awsli.com.br/100/100974/arquivos/portas-e-janelas-personalizadas---mobile.png",
     "link": "https://linktr.ee/mercosulatendimento"
   }
 ];
@@ -177,320 +169,15 @@ window.fullBannerMobile = [
 
 // Substitua o formatador de preços atual por esta versão
 
-// Formatador de preços otimizado para conviver com o featuredProducts-timer
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Inicializando formatador de preços compatível com timer');
-    
-    // Cache de elementos já processados
-    const elementosProcessados = new WeakSet();
-    
-    // Cache de elementos modificados por ID ou seletor
-    const elementosModificadosCache = new Set();
-    
-    // Contador de verificações sem mudanças
-    let verificacoesSemNovos = 0;
-    const MAX_VERIFICACOES_SEM_NOVOS = 5;
-    
-    // Variáveis para intervalos
-    let intervaloVerificacao = null;
-    
-    // Estilos
-    const style = document.createElement('style');
-    style.textContent = `
-        .novo-layout {
-            font-family: Arial, sans-serif !important;
-            line-height: 1.3 !important;
-        }
+import { inicializarFormataPrecos } from './formatadorPrecos.js';
 
-        .preco-de {
-            color: #888 !important;
-            font-size: 14px !important;
-            text-decoration: line-through !important;
-            display: block !important;
-            margin-bottom: 3px !important;
-        }
-
-        .preco-principal {
-            font-size: 28px !important;
-            font-weight: bold !important;
-            color: #333333 !important;
-            display: block !important;
-            margin-top: 5px !important;
-            margin-bottom: 3px !important;
-            font-weight: 700 !important;
-        }
-
-        .preco-principal strong {
-            color: #00a650 !important; /* Verde para preço PIX */
-        }
-
-        .preco-parcelado {
-            font-size: 16px !important;
-            color: #666666 !important;
-            margin-top: 5px !important;
-            margin-bottom: 3px !important;
-        }
-
-        .preco-parcelado strong {
-            color: #3483fa !important; /* Azul para valores parcelados */
-            font-weight: 700 !important;
-        }
-
-        /* Estilos para mobile */
-        @media (max-width: 600px) {
-            .preco-principal {
-                font-size: 24px !important;
-            }
-            .preco-parcelado {
-                font-size: 14px !important;
-            }
-            .preco-de {
-                font-size: 10px !important;
-            }
-        }
-        
-        /* Estilos para proteger elementos do timer */
-        .featuredProducts-timer {
-            pointer-events: auto !important;
-        }
-        
-        .featuredProducts-timer * {
-            pointer-events: auto !important;
-        }
-    `;
-    document.head.appendChild(style);
-    
-    // Formatador de valores
-    function formatarValor(valor) {
-        return valor.toFixed(2).replace(".", ",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-    }
-    
-    // Gerar identificador único para elemento
-    function getElementIdentifier(el) {
-        // Se o elemento tem ID, usamos ele
-        if (el.id) return `#${el.id}`;
-        
-        // Caso contrário, cria um caminho relativo baseado em classes
-        let path = [];
-        let currentEl = el;
-        
-        // Tenta gerar um identificador único de até 3 níveis
-        for (let i = 0; i < a; i++) {
-            if (!currentEl || currentEl === document.body) break;
-            
-            let identifier = currentEl.tagName.toLowerCase();
-            if (currentEl.className) {
-                const classes = Array.from(currentEl.classList).join('.');
-                if (classes) identifier += `.${classes}`;
-            }
-            
-            path.unshift(identifier);
-            currentEl = currentEl.parentElement;
-        }
-        
-        return path.join(' > ');
-    }
-    
-    // Verificar se o elemento está relacionado ao timer
-    function isTimerElement(el) {
-        // Verifica se o elemento ou seus ancestrais estão relacionados ao timer
-        let current = el;
-        while (current && current !== document.body) {
-            if (current.classList && 
-                (current.classList.contains('featuredProducts-timer') || 
-                 current.classList.contains('countdown') ||
-                 current.classList.contains('timer'))) {
-                return true;
-            }
-            current = current.parentElement;
-        }
-        return false;
-    }
-    
-    // Formatar um elemento de preço
-    function formatarPreco(el) {
-        // Ignorar elementos do timer
-        if (isTimerElement(el)) {
-            return false;
-        }
-        
-        // Verificar se já foi processado
-        if (elementosProcessados.has(el) || el.querySelector('.novo-layout')) {
-            return false;
-        }
-        
-        // Verificar pelo identificador
-        const elId = getElementIdentifier(el);
-        if (elementosModificadosCache.has(elId)) {
-            return false;
-        }
-        
-        // Marcar como processado para evitar duplicação
-        elementosProcessados.add(el);
-        elementosModificadosCache.add(elId);
-        el.setAttribute('data-formatado', 'true');
-        
-        // Extração de preços baseada no contexto
-        const isCartPage = window.location.pathname.includes('/carrinho');
-        const isCartItem = el.closest('.col-item-unit-price');
-        
-        let valorBase, valorOriginal;
-
-        try {
-            // Lógica para carrinho
-            if (isCartPage && isCartItem) {
-                valorBase = parseFloat(isCartItem.getAttribute('data-item-unit-valor'));
-                valorOriginal = el.querySelector('.preco-venda') ? 
-                    parseFloat(el.querySelector('.preco-venda').innerText.replace(/[^\d,]/g, "").replace(",", ".").trim()) : 
-                    null;
-            } 
-            // Lógica para outras páginas
-            else {
-                const precoOriginal = el.querySelector('.preco-venda');
-                const precoParcelado = el.querySelector('.preco-promocional.cor-principal, .preco-venda.cor-principal');
-                
-                valorOriginal = precoOriginal ? 
-                    parseFloat(precoOriginal.innerText.replace(/[^\d,]/g, "").replace(",", ".").trim()) : 
-                    null;
-                    
-                valorBase = precoParcelado ? 
-                    parseFloat(precoParcelado.innerText.replace(/[^\d,]/g, "").replace(",", ".").trim()) : 
-                    valorOriginal;
-            }
-
-            if (!valorBase || isNaN(valorBase)) {
-                return false;
-            }
-
-            // Calcular desconto PIX de 10%
-            const valorPix = valorBase - (valorBase * 0.10);
-
-            // Construir layout de preço
-            const novoLayout = document.createElement("div");
-            novoLayout.classList.add("novo-layout");
-
-            if (valorOriginal && valorOriginal !== valorBase) {
-                const precoDe = document.createElement("div");
-                precoDe.classList.add("preco-de");
-                precoDe.innerHTML = `De: <strong><s>${formatarValor(valorOriginal)}</s></strong> por `;
-                novoLayout.appendChild(precoDe);
-            }
-
-            const precoPixContainer = document.createElement("div");
-            precoPixContainer.classList.add("preco-principal");
-            precoPixContainer.innerHTML = `<strong>${formatarValor(valorPix)} no Pix</strong>`;
-            novoLayout.appendChild(precoPixContainer);
-
-            const precoParceladoContainer = document.createElement("div");
-            precoParceladoContainer.classList.add("preco-parcelado");
-            precoParceladoContainer.innerHTML = `ou <strong>${formatarValor(valorBase)}</strong> em <strong>12x</strong> de <strong>${formatarValor(valorBase / 12)}</strong>`;
-            novoLayout.appendChild(precoParceladoContainer);
-
-            // Substituir o conteúdo original
-            el.innerHTML = "";
-            el.appendChild(novoLayout);
-            
-            return true;
-        } catch (error) {
-            console.error('Erro ao formatar preço:', error);
-            return false;
-        }
-    }
-    
-    // Processar elementos existentes e retornar número formatados
-    function processarElementos() {
-        // Excluir explicitamente elementos relacionados ao timer
-        const elementos = document.querySelectorAll('.preco-produto:not([data-formatado]):not(.featuredProducts-timer *), .destaque-avista:not([data-formatado]):not(.featuredProducts-timer *)');
-        
-        let formatados = 0;
-        elementos.forEach(el => {
-            if (formatarPreco(el)) {
-                formatados++;
-            }
-        });
-        
-        return formatados;
-    }
-    
-    // Limpar todos os intervalos e desconectar observer
-    function pararFormatador() {
-        if (intervaloVerificacao) {
-            clearInterval(intervaloVerificacao);
-            intervaloVerificacao = null;
-        }
-        
-        if (observer) {
-            observer.disconnect();
-            observer = null;
-        }
-        
-        console.log('✅ Formatador de preços finalizado - todos os preços processados');
-    }
-    
-    // Observer para detectar mudanças no DOM
-    const observer = new MutationObserver(mutations => {
-        let precisaVerificar = false;
-        
-        mutations.forEach(mutation => {
-            if (mutation.type === 'childList') {
-                mutation.addedNodes.forEach(node => {
-                    if (node.nodeType === 1) { // Elemento DOM
-                        // Ignorar explicitamente elementos do timer
-                        if (isTimerElement(node)) return;
-                        
-                        // Verificar se o nó é um preço ou contém preços
-                        if ((node.classList && 
-                             (node.classList.contains('preco-produto') || 
-                              node.classList.contains('destaque-avista'))) || 
-                            (node.querySelectorAll && 
-                             node.querySelectorAll('.preco-produto:not(.featuredProducts-timer *), .destaque-avista:not(.featuredProducts-timer *)').length > 0)) {
-                            precisaVerificar = true;
-                        }
-                    }
-                });
-            }
-        });
-        
-        if (precisaVerificar) {
-            const formatados = processarElementos();
-            if (formatados > 0) {
-                verificacoesSemNovos = 0;
-                console.log(`Formatados ${formatados} novos preços detectados pelo observer`);
-            }
-        }
+// Inicializar formatador unificado se não estiver na página do carrinho
+if (!window.location.pathname.includes('/carrinho') && 
+    !window.location.pathname.includes('/carrinho/index')) {
+    document.addEventListener('DOMContentLoaded', function() {
+        inicializarFormataPrecos();
     });
-    
-    // Iniciar observer
-    observer.observe(document.body, { 
-        childList: true, 
-        subtree: true,
-        attributes: false
-    });
-    
-    // Processar elementos iniciais
-    const formatadosInicial = processarElementos();
-    console.log(`Formatação inicial: ${formatadosInicial} elementos de preço formatados`);
-    
-    // Iniciar verificação periódica que se auto-desativa
-    intervaloVerificacao = setInterval(() => {
-        const formatados = processarElementos();
-        
-        if (formatados === 0) {
-            verificacoesSemNovos++;
-            console.log(`Nenhum novo preço encontrado (verificação ${verificacoesSemNovos}/${MAX_VERIFICACOES_SEM_NOVOS})`);
-            
-            if (verificacoesSemNovos >= MAX_VERIFICACOES_SEM_NOVOS) {
-                pararFormatador();
-            }
-        } else {
-            console.log(`Formatados ${formatados} novos preços encontrados na verificação periódica`);
-            verificacoesSemNovos = 0;
-        }
-    }, 1000);
-    
-    // Garantia final que o formatador será finalizado após 10 segundos
-    setTimeout(pararFormatador, 10000);
-});
+}
 
 // Configuração do reposicionamento do SmartHint
 $(document).ready(function() {
@@ -505,193 +192,59 @@ $(document).ready(function() {
     }, 300);
 });
 
+import { createResponsiveImageSection } from './sectionImages.js';
+
 // Configuração da seção de imagens responsivas
 $(document).ready(function() {
-    // Função para criar a nova seção com imagens
-    function createNewSection2() {
-        // Cria a nova seção
-        const newSection = document.createElement('div');
-        newSection.classList.add('new-section');
-
-        // URLs das imagens para mobile
-        const mobileImages = [
-            'https://cdn.awsli.com.br/100/100974/arquivos/mobile-1.png',
-            'https://cdn.awsli.com.br/100/100974/arquivos/mobile-2.png',
-            'https://cdn.awsli.com.br/100/100974/arquivos/mobile-4.png',
-            'https://cdn.awsli.com.br/100/100974/arquivos/mobile-5.png'
-        ];
-
-        // URLs das imagens para desktop
-        const desktopImages = [
-            'https://cdn.awsli.com.br/100/100974/arquivos/desktop-1.png',
-            'https://cdn.awsli.com.br/100/100974/arquivos/desktop-2.png',
-            'https://cdn.awsli.com.br/100/100974/arquivos/desktop-4.png',
-            'https://cdn.awsli.com.br/100/100974/arquivos/desktop-5.png'
-        ];
-
-        // URLs de redirecionamento
-        const links = [
-            'https://www.mercosulvendas.com.br/#&search-term=Linha%20Fit%2014',
-            'https://www.mercosulvendas.com.br/#&search-term=Linha%20Classic%2016',
-            'https://www.mercosulvendas.com.br/#&search-term=Linha%20Master%2020',
-            'https://www.mercosulvendas.com.br/#&search-term=Linha%20Maxx%2025'
-        ];
-
-        // Adiciona 4 imagens à nova seção
-        for (let i = 0; i < 4; i++) {
-            const link = document.createElement('a');
-            link.href = links[i];
-            link.target = '_blank'; // Abre o link em uma nova aba
-
-            const picture = document.createElement('picture');
-
-            const sourceMobile = document.createElement('source');
-            sourceMobile.media = "(max-width: 768px)";
-            sourceMobile.srcset = mobileImages[i]; // Imagens mobile
-
-            const img = document.createElement('img');
-            img.src = desktopImages[i]; // Imagens desktop
-            img.alt = `Image ${i + 1}`;
-
-            picture.appendChild(sourceMobile);
-            picture.appendChild(img);
-            link.appendChild(picture);
-            newSection.appendChild(link);
-        }
-
-        // Insere a nova seção abaixo da seção existente
-        const existingSection = document.querySelector('.secao-principal.row-fluid.sem-coluna');
-        if (existingSection) {
-            existingSection.insertAdjacentElement('afterend', newSection);
-            
-            // Cria os estilos via DOM
-            const style = document.createElement('style');
-            style.textContent = `
-                .new-section {
-                    display: flex;
-                    gap: 4px;
-                }
-
-                .new-section img {
-                    width: 100%;
-                    height: auto;
-                    object-fit: contain;
-                    border-radius: 20px;
-                }
-
-                @media (max-width: 768px) {
-                    .new-section {
-                        flex-direction: column;
-                    }
-
-                    .new-section img {
-                        width: 100%;
-                        height: auto;
-                        object-fit: contain;
-                    }
-                }
-            `;
-            document.head.appendChild(style);
-            
-            console.log('Seção de imagens responsivas criada com sucesso');
-        } else {
-            console.warn('Elemento .secao-principal.row-fluid.sem-coluna não encontrado');
-        }
-    }
-
-    // Tenta criar a seção, mas apenas se estiver na página inicial
+    // Tenta criar a seção apenas se estiver na página inicial
     if (window.location.pathname === '/' || window.location.pathname === '/index') {
-        // Atrasa ligeiramente para garantir que todos os elementos da página estejam carregados
-        setTimeout(createNewSection2, 1000);
-    }
-});
-
-// Adicione após a configuração da seção de imagens responsivas, antes do console.log final
-
-// Formatador de preços do carrinho com melhor visualização de desconto PIX
-$(document).ready(function() {
-    let lastTotal = '';
-    let lastParcelas = '';
-    let lastPix = '';
-    
-    // Função principal para formatar os preços do carrinho
-    function styleCartPrices() {
-        // Apenas executar na página do carrinho
-        if (!window.location.pathname.includes('/carrinho')) return;
-        
-        const totalElement = document.querySelector('.valor-total');
-        const parcelasSpan = document.querySelector('.descontos.parcelas span');
-        const pixPrice = document.querySelector('.descontos.avista strong');
-        const pixSpan = document.querySelector('.descontos.avista span');
-        const totalDiv = document.querySelector('.total');
-
-        if (!totalElement || !parcelasSpan || !pixPrice || !pixSpan) return;
-
-        const currentTotal = totalElement.textContent;
-        const currentParcelas = parcelasSpan.textContent;
-        const currentPix = pixPrice.textContent;
-
-        // Apenas atualizar se houver mudanças nos valores
-        if (currentTotal === lastTotal && 
-            currentParcelas === lastParcelas && 
-            currentPix === lastPix) return;
-
-        try {
-            // Update PIX text and styling
-            pixSpan.innerHTML = `Total: <strong style="color: #00a650; font-size: 22px; font-weight: 700;">${currentPix}</strong> no PIX com <strong style="color: #00a650; font-weight: 600; font-size: 14px;">10% de desconto</strong>`;
-
-            // Update card payment text and styling
-            const parcelas = currentParcelas.match(/(\d+)x.*R\$ ([\d.,]+)/);
-            if (parcelas) {
-                const [, numParcelas, valorParcela] = parcelas;
-                parcelasSpan.innerHTML = `ou <strong style="color: #3483fa; font-size: 18px; font-weight: 600;">${currentTotal}</strong> em até <strong style="color: #3483fa; font-weight: 600;">${numParcelas}x</strong> de <strong style="color: #3483fa; font-weight: 600;">R$ ${valorParcela}</strong> sem juros`;
-                
-                if (totalDiv) {
-                    totalDiv.style.display = 'none';
-                }
-            }
-
-            // Update last known values
-            lastTotal = currentTotal;
-            lastParcelas = currentParcelas;
-            lastPix = currentPix;
+        // Atrasa ligeiramente para garantir que todos os elementos estejam carregados
+        setTimeout(() => {
+            // Configuração das imagens e links
+            const sectionConfig = {
+                containerClass: 'new-section',
+                mobileImages: [
+                    'https://cdn.awsli.com.br/100/100974/arquivos/mobile-1.png',
+                    'https://cdn.awsli.com.br/100/100974/arquivos/mobile-2.png',
+                    'https://cdn.awsli.com.br/100/100974/arquivos/mobile-4.png',
+                    'https://cdn.awsli.com.br/100/100974/arquivos/mobile-5.png'
+                ],
+                desktopImages: [
+                    'https://cdn.awsli.com.br/100/100974/arquivos/desktop-1.png',
+                    'https://cdn.awsli.com.br/100/100974/arquivos/desktop-2.png',
+                    'https://cdn.awsli.com.br/100/100974/arquivos/desktop-4.png',
+                    'https://cdn.awsli.com.br/100/100974/arquivos/desktop-5.png'
+                ],
+                links: [
+                    'https://www.mercosulvendas.com.br/#&search-term=Linha%20Fit%2014',
+                    'https://www.mercosulvendas.com.br/#&search-term=Linha%20Classic%2016',
+                    'https://www.mercosulvendas.com.br/#&search-term=Linha%20Master%2020',
+                    'https://www.mercosulvendas.com.br/#&search-term=Linha%20Maxx%2025'
+                ],
+                openInNewTab: false, // Links abrem na mesma aba
+                borderRadius: '20px',
+                gap: '4px'
+            };
             
-            console.log('Preços do carrinho formatados com sucesso');
-        } catch (error) {
-            console.error('Erro ao atualizar preços do carrinho:', error);
-        }
-    }
-
-    // Inicializar apenas na página do carrinho
-    if (window.location.pathname.includes('/carrinho')) {
-        // Primeira execução com pequeno atraso para garantir carregamento da página
-        setTimeout(styleCartPrices, 300);
-        
-        // Configurar o MutationObserver para detectar mudanças no carrinho
-        const observer = new MutationObserver(function() {
-            styleCartPrices();
-        });
-        
-        // Observar todo o corpo da página para capturar atualizações de AJAX
-        observer.observe(document.body, { 
-            childList: true, 
-            subtree: true 
-        });
-        
-        // Backup com intervalo para caso o observer não capture alguma mudança
-        const intervalId = setInterval(styleCartPrices, 500);
-        
-        // Limpar o intervalo após 30 segundos para economizar recursos
-        setTimeout(function() {
-            clearInterval(intervalId);
-            console.log('Intervalo de verificação de preços do carrinho finalizado');
-        }, 30000);
-        
-        console.log('Formatador de preços do carrinho inicializado');
+            createResponsiveImageSection(sectionConfig);
+        }, 1000);
     }
 });
 
 // Adicione antes do console.log('Configurações do tema carregadas');
+
+// Carregar o redesign do carrinho
+if (window.location.pathname.includes('/carrinho')) {
+    // Importar nosso script específico para redesign do carrinho
+    const script = document.createElement('script');
+    script.src = '/js/components/carrinhoRedesign.js';
+    document.head.appendChild(script);
+    // Caso o script não carregue, execute uma versão embutida
+    script.onerror = function() {
+        console.log('Erro ao carregar o script do carrinho, usando versão embutida');
+        // Cole aqui o conteúdo do script acima se necessário
+    };
+}
 
 // Desativar popup do carrinho na versão desktop
 $(document).ready(function() {

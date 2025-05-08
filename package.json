@@ -17,6 +17,7 @@
     "clean-webpack-plugin": "^4.0.0",
     "connect-history-api-fallback": "^2.0.0",
     "connect-http-please": "^0.3.0",
+    "copy-webpack-plugin": "^13.0.0",
     "css-loader": "^6.8.1",
     "express": "^4.18.2",
     "html-webpack-plugin": "^5.5.3",

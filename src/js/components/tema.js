@@ -3,7 +3,7 @@
  * Versão simplificada que trabalha com as variáveis globais já definidas em temaConfig.js
  */
 
-import { inicializarFormataPrecos } from './tema/formataPrecos.js';
+import { inicializarFormataPrecos } from './formatadorPrecos.js';
 
 /**
  * Função principal que aplica personalizações adicionais ao tema
@@ -20,9 +20,10 @@ export function inicializarTema() {
   // Inicializações que requerem JavaScript além da simples configuração
   
   // 1. Configurar contador regressivo (se existir)
-  if (window.counterTime && window.counterTime.createTimerValue) {
-    inicializarContadorRegressivo(window.counterTime.createTimerValue);
-  }
+  // Contador regressivo desativado conforme solicitado
+  // if (window.counterTime && window.counterTime.createTimerValue) {
+  //   inicializarContadorRegressivo(window.counterTime.createTimerValue);
+  // }
   
   // 2. Configurar slider de categorias (se existir)
   if (window.slideCategorias && window.slideCategorias.length > 0) {
