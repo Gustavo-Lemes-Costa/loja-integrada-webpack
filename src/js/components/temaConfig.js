@@ -160,8 +160,8 @@ window.slideCategorias = [
 // Configuração do banner mobile
 window.fullBannerMobile = [
   {
-    "imagem": "https://cdn.awsli.com.br/100/100974/arquivos/portas-e-janelas-personalizadas---mobile.png",
-    "link": "https://linktr.ee/mercosulatendimento"
+    "imagem": "https://cdn.awsli.com.br/100/100974/arquivos/banner-frota-pr-pria---mobile.png",
+    "link": "https://www.mercosulvendas.com.br/super-ofertas-do-mes"
   }
 ];
 
@@ -233,7 +233,9 @@ $(document).ready(function() {
 
 // Adicione antes do console.log('Configurações do tema carregadas');
 
+// TEMPORARIAMENTE DESATIVADO - ATUALIZAÇÃO DE EMERGÊNCIA DOS BANNERS
 // Carregar o redesign do carrinho
+/* 
 if (window.location.pathname.includes('/carrinho')) {
     // Importar nosso script específico para redesign do carrinho
     const script = document.createElement('script');
@@ -244,6 +246,20 @@ if (window.location.pathname.includes('/carrinho')) {
         console.log('Erro ao carregar o script do carrinho, usando versão embutida');
         // Cole aqui o conteúdo do script acima se necessário
     };
+}
+*/
+
+// Carregar a formatação simples de preços para o carrinho
+if (window.location.pathname.includes('/carrinho')) {
+    // Importar o formatador de preços do carrinho
+    import('./carrinhoPrecos.js').then(module => {
+        console.log('Formatador de preços do carrinho carregado');
+        if (typeof module.formatarPrecosCarrinho === 'function') {
+            module.formatarPrecosCarrinho();
+        }
+    }).catch(err => {
+        console.error('Erro ao carregar o formatador de preços do carrinho:', err);
+    });
 }
 
 // Desativar popup do carrinho na versão desktop

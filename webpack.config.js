@@ -75,10 +75,10 @@ module.exports = {
     new webpack.HotModuleReplacementPlugin(),
     new MiniCssExtractPlugin({
         filename: `${accountName}-min.css`, // Use accountName em vez de name
-    }),
-    new CopyPlugin({
+    }),    new CopyPlugin({
       patterns: [
         { from: './src/js/components/carrinhoRedesign.js', to: 'js/components/' },
+        { from: './src/js/components/carrinhoPrecos.js', to: 'js/components/' },
       ],
     }),
   ],

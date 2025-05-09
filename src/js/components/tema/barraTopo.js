@@ -5,7 +5,7 @@
 // Configuração da barra de topo
 const config = {
   link: "https://linktr.ee/mercosulatendimento",
-  texto: " Mês de Aniversário Mercosul O frete é por nossa conta, consulte condições! "
+  texto: " Compre pelo Whatsapp (41) 99912-0921 ou clique aqui! "
 };
 
 /**

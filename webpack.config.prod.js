@@ -45,6 +45,11 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: `${accountName}-min.css`, // Use accountName em vez de name
     }),
+    new (require('copy-webpack-plugin'))({
+      patterns: [
+        { from: './src/js/components/carrinhoPrecos.js', to: 'js/components/' },
+      ],
+    }),
   ],
   output: {
     path: path.resolve(__dirname, 'dist'),

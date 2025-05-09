@@ -14,7 +14,7 @@ export function initPromocaoButton() {
 
       // Cria um novo elemento <button> e adiciona ao novo <li>
       const newButton = document.createElement('button');
-      newButton.textContent = 'OFERTAS DA SEMANA';
+      newButton.textContent = 'OFERTAS DO MÊS';
       newButton.className = 'black-friday-button';
       newButton.onclick = function() {
         window.location.href = 'https://www.mercosulvendas.com.br/super-ofertas-do-mes';
