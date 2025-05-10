@@ -47,7 +47,7 @@ window.newsletter = {
 // Configuração da barra de topo
 window.barraTopo = {
   "link": "https://linktr.ee/mercosulatendimento",
-  "texto": " Mês de Aniversário Mercosul O frete é por nossa conta, consulte condições! "
+  "texto": " Compre pelo Whatsapp clicando aqui! "
 };
 
 // Configuração das avaliações
