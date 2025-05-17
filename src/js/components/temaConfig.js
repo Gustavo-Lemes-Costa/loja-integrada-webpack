@@ -44,12 +44,6 @@ window.newsletter = {
   cupom: ' '
 };
 
-// Configuração da barra de topo
-window.barraTopo = {
-  "link": "https://linktr.ee/mercosulatendimento",
-  "texto": " Compre pelo Whatsapp clicando aqui! "
-};
-
 // Configuração das avaliações
 window.avaliacoes = [
   {
@@ -640,15 +634,22 @@ $(document).ready(function() {
             // Update PIX text and styling
             pixSpan.innerHTML = `Total: <strong style="color: #00a650; font-size: 22px; font-weight: 700;">${currentPix}</strong> no PIX com <strong style="color: #00a650; font-weight: 600; font-size: 14px;">10% de desconto</strong>`;
 
-            // Update card payment text and styling
-            const parcelas = currentParcelas.match(/(\d+)x.*R\$ ([\d.,]+)/);
-            if (parcelas) {
-                const [, numParcelas, valorParcela] = parcelas;
-                parcelasSpan.innerHTML = `ou <strong style="color: #3483fa; font-size: 18px; font-weight: 600;">${currentTotal}</strong> em até <strong style="color: #3483fa; font-weight: 600;">${numParcelas}x</strong> de <strong style="color: #3483fa; font-weight: 600;">R$ ${valorParcela}</strong> sem juros`;
-                
-                if (totalDiv) {
-                    totalDiv.style.display = 'none';
+            // Forçar sempre 8x no parcelamento
+            const numParcelas = 8;
+            // Extrai o valor numérico do total
+            let valorTotal = parseFloat(currentTotal.replace(/[^\d,]/g, '').replace(',', '.'));
+            if (isNaN(valorTotal) || valorTotal === 0) {
+                // fallback: tenta extrair do valor de parcela existente
+                const match = currentParcelas.match(/R\$ ([\d.,]+)/);
+                if (match) {
+                    valorTotal = parseFloat(match[1].replace('.', '').replace(',', '.')) * numParcelas;
                 }
+            }
+            let valorParcela = (valorTotal / numParcelas).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            parcelasSpan.innerHTML = `ou <strong style="color: #3483fa; font-size: 18px; font-weight: 600;">${currentTotal}</strong> em até <strong style="color: #3483fa; font-weight: 600;">${numParcelas}x</strong> de <strong style="color: #3483fa; font-weight: 600;">R$ ${valorParcela}</strong> sem juros`;
+            
+            if (totalDiv) {
+                totalDiv.style.display = 'none';
             }
 
             // Update last known values

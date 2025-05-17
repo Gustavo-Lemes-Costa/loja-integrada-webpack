@@ -125,7 +125,7 @@ function formatarPrecos(el) {
 
         let precoParceladoContainer = document.createElement("div");
         precoParceladoContainer.classList.add("preco-parcelado");
-        precoParceladoContainer.innerHTML = `ou <strong>${formatarValor(valorBase)}</strong> em <strong>12x</strong> de <strong>${formatarValor(valorBase / 12)}</strong>`;
+        precoParceladoContainer.innerHTML = `ou <strong>${formatarValor(valorBase)}</strong> em <strong>8x</strong> de <strong>${formatarValor(valorBase / 8)}</strong>`;
 
         novoLayout.appendChild(precoParceladoContainer);
 

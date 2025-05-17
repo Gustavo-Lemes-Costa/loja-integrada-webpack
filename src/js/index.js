@@ -8,6 +8,7 @@ import { removeInfoEstoque } from './components/estoque';
 import { modificarPaginaCarrinho } from './components/carrinho.js';
 import { inicializarTema } from './components/tema.js';
 import { inicializarConfigTema } from './components/temaConfig.js';
+import { configurarBarraTopo } from './components/tema/barraTopo.js';
 
 // Inicializar componentes
 document.addEventListener('DOMContentLoaded', () => {
@@ -16,6 +17,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Depois inicializa componentes que dependem dessas configurações
     inicializarTema();
+    
+    // Inicializar barra de topo personalizada
+    configurarBarraTopo();
     
     // Inicializar botão WhatsApp
     initWhatsAppButton();
